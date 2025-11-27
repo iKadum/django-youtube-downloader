@@ -9,7 +9,7 @@
 
 <form method="POST">
   {% csrf_token %}
-  <label>First name:</label><br>
+  <label>Video URL:</label><br>
   <input type="text" name="video_url" value="{{ video_url }}" placeholder="URL"><br>
   <input type="submit" value="Submit">
 </form>
