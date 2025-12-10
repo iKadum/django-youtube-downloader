@@ -29,8 +29,8 @@ def download(request, video_id, itag):
     print(video_id)
     yt = YouTube(f"https://youtube.com/watch?v={video_id}")
     video = yt.streams.get_by_itag(itag)
-    video.download()
-    filename = video.default_filename
+    filename = video.default_filename.replace("|", "")  # get the filename without "|"
+    video.download(filename=filename)
 
     file = FileWrapper(open(filename, "rb"))
     response = HttpResponse(file, content_type='application/vnd.mp4')
