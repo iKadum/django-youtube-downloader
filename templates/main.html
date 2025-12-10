@@ -1,18 +1,49 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Downloader</title>
-    <link href="" rel="stylesheet">
+    <link href="{% static 'styles/style.css' %}" rel="stylesheet">
 </head>
-<body>
+<body style="background-color: lightblue;font-family: verdana;">
+
+<h1><a href="/">YouTube Downloader</a></h1>
 
 <form method="POST">
   {% csrf_token %}
   <label>Video URL:</label><br>
-  <input type="text" name="video_url" value="{{ video_url }}" placeholder="URL"><br>
+  <input type="text" name="video_url" value="{{ video_url }}" placeholder="URL" size="60">
   <input type="submit" value="Submit">
 </form>
+
+{% if messages %}
+<ul class="messages" style="font-size:12px;">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<br>
+
+{% if yt %}
+
+<h2>{{ yt.title }}</h2>
+<h3>by {{ yt.author }}</h3>
+
+<div style="float:left; width: 640px; margin-right: 30px;">
+   <p><img src="{{ yt.thumbnail_url }}"></p>
+</div>
+
+<div style="float:left;">
+   {% for stream in streams_list %}
+    <p><a href="{% url 'download' stream.itag %}">Download</a> - {{ stream.type }}  ({{ stream.filesize }} MB
+        {{ stream.mime_type }}{% if stream.fps %}, {{ stream.resolution }}, {{ stream.fps }} fps{% endif %})</p>
+    {% endfor %}
+</div>
+<div style="clear:both;"></div>
+{% endif %}
 
 </body>
 </html>
