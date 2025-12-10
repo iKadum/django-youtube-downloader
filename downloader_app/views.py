@@ -4,13 +4,11 @@ from wsgiref.util import FileWrapper
 import os
 from .functions import *
 
-yt = None
-
 
 def home(request):
-    global yt
-    streams_list = None
-    video_url = None
+    yt = None
+    streams_list = []
+    video_url = ""
 
     if request.method == "POST":
         video_url = request.POST.get("video_url")
@@ -27,7 +25,9 @@ def home(request):
     return render(request, "main.html", context)
 
 
-def download(request, itag):
+def download(request, video_id, itag):
+    print(video_id)
+    yt = YouTube(f"https://youtube.com/watch?v={video_id}")
     video = yt.streams.get_by_itag(itag)
     video.download()
     filename = video.default_filename
