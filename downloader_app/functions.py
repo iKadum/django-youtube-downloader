@@ -5,6 +5,8 @@ from django.templatetags.static import static
 from django.conf import settings
 from django.contrib import messages
 
+RESERVED_CHARACTERS = '<>:"/\\|?*'
+
 
 def create_yt_object(url, request):
     try:
@@ -46,4 +48,19 @@ def create_streams(yt):
             "filesize": f"{stream.filesize / 1048576:.1f}",
         })
     return streams_list
+
+
+def download_yt(video_id, itag):
+    yt = YouTube(f"https://youtube.com/watch?v={video_id}")
+    video = yt.streams.get_by_itag(itag)
+    filename = video.default_filename
+
+    # remove all reserved characters from filename
+    for char in filename:
+        if char in RESERVED_CHARACTERS:
+            filename = filename.replace(char, "")
+
+    video.download(filename=filename)
+
+    return filename
 
