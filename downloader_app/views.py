@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from wsgiref.util import FileWrapper
-import os
+
 from .functions import *
 
 
@@ -12,7 +12,7 @@ def home(request):
 
     if request.method == "POST":
         video_url = request.POST.get("video_url")
-        yt = create_yt_object(video_url, request)
+        yt = create_yt_object(request, video_url)
 
         if yt:
             streams_list = create_streams(yt)  # create streams from yt object and return streams list
@@ -21,14 +21,19 @@ def home(request):
         "yt": yt,
         "streams_list": streams_list,
         "video_url": video_url,
+        "v": "v",  # download parameter for video
+        "a": "a",  # download parameter for audio
+        "m": "m",  # download parameter for audio mp3
     }
     return render(request, "main.html", context)
 
 
 def download(request, video_id, itag):
-    filename = download_yt(video_id, itag)  # download video and get the filename
+    filename = download_yt(video_id, itag)  # download stream to server and return filename
     file = FileWrapper(open(filename, "rb"))
-    response = HttpResponse(file, content_type='application/vnd.mp4')
+    response = HttpResponse(file, content_type='application')
     response["Content-Disposition"] = f"attachment; filename = {filename}"
-    os.remove(filename)
+    os.remove(filename)  # delete file from server
     return response
+
+

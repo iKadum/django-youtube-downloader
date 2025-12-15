@@ -37,8 +37,13 @@
 </div>
 
 <div style="float:left;">
-   {% for stream in streams_list %}
-    <p><a href="{% url 'download' yt.video_id stream.itag %}">Download</a> - {{ stream.type }}  ({{ stream.filesize }} MB
+    <p><a href="{% url 'download' yt.video_id v %}">Download video with audio</a></p>
+    <p><a href="{% url 'download' yt.video_id a %}">Download audio m4a</a></p>
+    <p><a href="{% url 'download' yt.video_id m %}">Download audio mp3</a></p>
+
+    <h5 style="margin-bottom: -6px;">All available streams:</h5>
+    {% for stream in streams_list %}
+    <p style="font-size:10px;"><a href="{% url 'download' yt.video_id stream.itag %}">{{ stream.type }}</a> ({{ stream.filesize }} MB
         {{ stream.mime_type }}{% if stream.fps %}, {{ stream.resolution }}, {{ stream.fps }} fps{% endif %})</p>
     {% endfor %}
 </div>
