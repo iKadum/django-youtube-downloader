@@ -1,8 +1,5 @@
 from pytubefix import YouTube, Buffer
-from pytubefix.cli import on_progress
 from pytubefix.exceptions import RegexMatchError
-from django.templatetags.static import static
-from django.conf import settings
 from moviepy import AudioFileClip
 from django.contrib import messages
 import os
@@ -52,12 +49,16 @@ def create_streams(yt):
     return streams_list
 
 
-def download_yt(video_id, itag):
+def download_yt(request, video_id, itag):
     yt = YouTube(f"https://youtube.com/watch?v={video_id}")
 
-    if itag == "v":
+    if itag == "s" or itag == "t":  # subtitles or transcript
+        filename = download_subtitles(video_id)
+        print("subtitles function over")
+        return filename
+    elif itag == "v":  # video with audio
         stream = yt.streams.get_highest_resolution()
-    elif itag == "a" or itag == "m":
+    elif itag == "a" or itag == "m":  # audio or mp3 audio
         stream = yt.streams.get_audio_only()
     else:
         stream = yt.streams.get_by_itag(itag)
@@ -69,10 +70,14 @@ def download_yt(video_id, itag):
         if char in RESERVED_CHARACTERS:
             filename = filename.replace(char, "")
 
+    # messages.info(request, "Preparing your file, please wait...")
+    print("Preparing your file, please wait...")
     stream.download(filename=filename)
-
     if itag == "m":
-        filename = convert_to_mp3(filename)  # return new .mp3 filename
+        filename = convert_to_mp3(filename)
+        return filename
+    # messages.success(request, "File ready for download!")
+    print("File ready for download!")
 
     return filename
 
@@ -88,12 +93,26 @@ def convert_to_mp3(filename):
         audio_file.write_audiofile(f"{filename[:-3]}mp3")  # write mp3 file
         audio_file.close()
         os.remove(filename)  # delete m4a file from server (mp3 remains)
+
     else:
         print("Sorry, no audio in this file, try another stream with audio.")
 
     return f"{filename[:-3]}mp3"  # return .mp3 filename
 
 
-def download_subtitles():
-    pass
+def download_subtitles(video_id):
+    yt = YouTube(f"https://youtube.com/watch?v={video_id}")
+    all_captions = yt.captions
 
+    if "en" in all_captions:
+        captions = yt.captions["en"]
+    elif "a.en" in all_captions:
+        captions = yt.captions["a.en"]
+    else:
+        captions = None
+        print("Sorry, no english subtitles in this video.")
+
+    if captions:
+        captions.save_captions("subtitles.txt")
+
+    return "subtitles.txt"  # return .txt filename

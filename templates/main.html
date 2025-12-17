@@ -40,6 +40,7 @@
     <p><a href="{% url 'download' yt.video_id v %}">Download video with audio</a></p>
     <p><a href="{% url 'download' yt.video_id a %}">Download audio m4a</a></p>
     <p><a href="{% url 'download' yt.video_id m %}">Download audio mp3</a></p>
+    <p><a href="{% url 'download' yt.video_id s %}">Download subtitles</a></p>
 
     <h5 style="margin-bottom: -6px;">All available streams:</h5>
     {% for stream in streams_list %}
