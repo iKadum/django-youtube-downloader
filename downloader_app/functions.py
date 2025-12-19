@@ -72,10 +72,14 @@ def download_yt(request, video_id, itag):
 
     # messages.info(request, "Preparing your file, please wait...")
     print("Preparing your file, please wait...")
-    stream.download(filename=filename)
-    if itag == "m":
+
+    if itag == "m":  # if download mp3
+        stream.download(filename=f"{filename}_temp.m4a")  # download temporary m4a file for converting
         filename = convert_to_mp3(filename)
         return filename
+    else:
+        stream.download(filename=filename)
+
     # messages.success(request, "File ready for download!")
     print("File ready for download!")
 
@@ -84,7 +88,7 @@ def download_yt(request, video_id, itag):
 
 def convert_to_mp3(filename):
     try:
-        audio_file = AudioFileClip(f"{filename}")  # open m4a file
+        audio_file = AudioFileClip(f"{filename}_temp.m4a")  # open the temporary m4a file
     except OSError:
         audio_file = None
         print("Sorry, file does not exist, please try again.")
@@ -92,7 +96,7 @@ def convert_to_mp3(filename):
     if audio_file:
         audio_file.write_audiofile(f"{filename[:-3]}mp3")  # write mp3 file
         audio_file.close()
-        os.remove(filename)  # delete m4a file from server (mp3 remains)
+        os.remove(f"{filename}_temp.m4a")  # delete the temporary m4a file from server (mp3 remains)
 
     else:
         print("Sorry, no audio in this file, try another stream with audio.")
