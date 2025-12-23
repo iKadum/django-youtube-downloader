@@ -54,7 +54,6 @@ def download_yt(request, video_id, itag):
 
     if itag == "s" or itag == "t":  # subtitles or transcript
         filename = download_subtitles(video_id)
-        print("subtitles function over")
         return filename
     elif itag == "v":  # video with audio
         stream = yt.streams.get_highest_resolution()
@@ -117,6 +116,8 @@ def download_subtitles(video_id):
         print("Sorry, no english subtitles in this video.")
 
     if captions:
-        captions.save_captions("subtitles.txt")
+        stream = yt.streams.get_highest_resolution()  # we need the filename
+        filename = stream.default_filename
+        captions.save_captions(f"{filename[:-3]}txt")
 
-    return "subtitles.txt"  # return .txt filename
+    return f"{filename[:-3]}txt"  # return .txt filename
