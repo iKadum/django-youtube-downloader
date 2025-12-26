@@ -7,6 +7,8 @@ from .functions import *
 
 def home(request):
     yt = None
+    all_captions = None
+
     streams_list = []
     video_url = ""
 
@@ -16,11 +18,13 @@ def home(request):
 
         if yt:
             streams_list = create_streams(yt)  # create streams from yt object and return streams list
+            all_captions = yt.captions
 
     context = {
         "yt": yt,
         "streams_list": streams_list,
         "video_url": video_url,
+        "all_captions": all_captions,
         "v": "v",  # download parameter for video
         "a": "a",  # download parameter for audio
         "m": "m",  # download parameter for audio mp3

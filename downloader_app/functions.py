@@ -106,6 +106,8 @@ def convert_to_mp3(filename):
 def download_subtitles(video_id):
     yt = YouTube(f"https://youtube.com/watch?v={video_id}")
     all_captions = yt.captions
+    stream = yt.streams.get_highest_resolution()  # we need the filename
+    filename = stream.default_filename
 
     if "en" in all_captions:
         captions = yt.captions["en"]
@@ -116,8 +118,6 @@ def download_subtitles(video_id):
         print("Sorry, no english subtitles in this video.")
 
     if captions:
-        stream = yt.streams.get_highest_resolution()  # we need the filename
-        filename = stream.default_filename
-        captions.save_captions(f"{filename[:-3]}txt")
-
-    return f"{filename[:-3]}txt"  # return .txt filename
+        new_filename = f"{filename[:-3]}txt"
+        captions.save_captions(new_filename)
+        return new_filename  # return .txt filename
