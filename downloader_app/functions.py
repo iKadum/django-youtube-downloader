@@ -49,25 +49,27 @@ def create_streams(yt):
     return streams_list
 
 
+def get_filename(stream):
+    filename = stream.default_filename
+    # remove all reserved characters from filename
+    for char in filename:
+        if char in RESERVED_CHARACTERS:
+            filename = filename.replace(char, "")
+
+    return filename
+
+
 def download_yt(request, video_id, itag):
     yt = YouTube(f"https://youtube.com/watch?v={video_id}")
 
-    if itag == "s" or itag == "t":  # subtitles or transcript
-        filename = download_subtitles(video_id)
-        return filename
-    elif itag == "v":  # video with audio
+    if itag == "v":  # video with audio
         stream = yt.streams.get_highest_resolution()
     elif itag == "a" or itag == "m":  # audio or mp3 audio
         stream = yt.streams.get_audio_only()
     else:
         stream = yt.streams.get_by_itag(itag)
 
-    filename = stream.default_filename
-
-    # remove all reserved characters from filename
-    for char in filename:
-        if char in RESERVED_CHARACTERS:
-            filename = filename.replace(char, "")
+    filename = get_filename(stream)
 
     # messages.info(request, "Preparing your file, please wait...")
     print("Preparing your file, please wait...")
@@ -103,21 +105,14 @@ def convert_to_mp3(filename):
     return f"{filename[:-3]}mp3"  # return .mp3 filename
 
 
-def download_subtitles(video_id):
+def download_subtitles(video_id, lang):
     yt = YouTube(f"https://youtube.com/watch?v={video_id}")
-    all_captions = yt.captions
-    stream = yt.streams.get_highest_resolution()  # we need the filename
-    filename = stream.default_filename
+    captions = yt.captions[lang]
 
-    if "en" in all_captions:
-        captions = yt.captions["en"]
-    elif "a.en" in all_captions:
-        captions = yt.captions["a.en"]
-    else:
-        captions = None
-        print("Sorry, no english subtitles in this video.")
+    stream = yt.streams.get_highest_resolution()  # we need a filename
+    filename = get_filename(stream)
 
     if captions:
-        new_filename = f"{filename[:-3]}txt"
+        new_filename = f"{filename[:-4]}_{lang}.txt"
         captions.save_captions(new_filename)
         return new_filename  # return .txt filename

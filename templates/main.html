@@ -20,7 +20,7 @@
 {% if messages %}
 <ul class="messages" style="font-size:12px;">
     {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
     {% endfor %}
 </ul>
 {% endif %}
@@ -41,14 +41,26 @@
     <p><a href="{% url 'download' yt.video_id a %}">Download audio m4a</a></p>
     <p><a href="{% url 'download' yt.video_id m %}">Download audio mp3</a></p>
     {% if all_captions.en %}
-    <p><a href="{% url 'download' yt.video_id s %}">Download subtitles</a></p>
+    <p><a href="{% url 'download_subtitles' yt.video_id en %}">Download english subtitles</a></p>
     {% endif %}
-
+    <hr style="margin-bottom: -15px;">
     <h5 style="margin-bottom: -6px;">All available streams:</h5>
     {% for stream in streams_list %}
     <p style="font-size:10px;"><a href="{% url 'download' yt.video_id stream.itag %}">{{ stream.type }}</a> ({{ stream.filesize }} MB
         {{ stream.mime_type }}{% if stream.fps %}, {{ stream.resolution }}, {{ stream.fps }} fps{% endif %})</p>
     {% endfor %}
+
+    {% if all_captions %}
+        <hr style="margin-bottom: -15px;">
+        <h5 style="margin-bottom: -6px;">All available subtitles:</h5>
+        {% for caption in all_captions %}
+        <p style="font-size:10px;">
+            <a href="{% url 'download_subtitles' yt.video_id caption.code %}">{{ caption.name}}</a>
+        </p>
+        {% endfor %}
+    {% endif %}
+
+
 </div>
 <div style="clear:both;"></div>
 {% endif %}

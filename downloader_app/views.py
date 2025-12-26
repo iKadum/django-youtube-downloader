@@ -28,14 +28,23 @@ def home(request):
         "v": "v",  # download parameter for video
         "a": "a",  # download parameter for audio
         "m": "m",  # download parameter for audio mp3
-        "s": "s",  # download parameter for subtitles
-        "t": "t",  # download parameter for transcript
+        "en": "en",  # download parameter for english subtitles
+
     }
     return render(request, "main.html", context)
 
 
 def download(request, video_id, itag):
     filename = download_yt(request, video_id, itag)  # download stream to server and return filename
+    file = FileWrapper(open(filename, "rb"))
+    response = HttpResponse(file, content_type='application')
+    response["Content-Disposition"] = f"attachment; filename = {filename}"
+    os.remove(filename)  # delete file from server
+    return response
+
+
+def download_sub(request, video_id, lang):
+    filename = download_subtitles(video_id, lang)  # download stream to server and return filename
     file = FileWrapper(open(filename, "rb"))
     response = HttpResponse(file, content_type='application')
     response["Content-Disposition"] = f"attachment; filename = {filename}"

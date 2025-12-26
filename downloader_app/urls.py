@@ -6,5 +6,6 @@ from django.conf.urls.static import static
 urlpatterns = [
     path("", views.home, name="homepage"),
     path("download/<str:video_id>/<str:itag>/", views.download, name="download"),
+    path("download_sub/<str:video_id>/<str:lang>/", views.download_sub, name="download_subtitles"),
 ]
 
